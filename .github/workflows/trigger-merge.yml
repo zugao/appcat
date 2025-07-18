@@ -291,16 +291,14 @@ jobs:
           echo "✅ Merging component PR: ${{ needs.check-conditions.outputs.comp-url }}"
           gh pr merge -R "$COMPONENT_REPO" ${{ needs.check-conditions.outputs.comp-pr-number }} --merge --delete-branch
 
-      - name: Create PR to merge master into develop
-        run: |
-          gh pr create \
-            --repo "$APPCAT_REPO" \
-            --base develop \
-            --head master \
-            --title "🔀 Merge master into develop (sync hotfixes)" \
-            --body "This PR synchronizes the hotfixes from master back into develop."
-
-      - name: Create PR to merge master into develop
+  merge-hotfix-update-develop:
+    needs: merge-hotfix
+    runs-on: ubuntu-latest
+    env:
+      APPCAT_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      COMPONENT_GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
+    steps:
+      - name: Create PR to merge master into develop in appcat repo
         run: |
           gh pr create \
             --repo "$APPCAT_REPO" \
@@ -309,6 +307,53 @@ jobs:
             --reviewer ${{ needs.check-conditions.outputs.author }} \
             --title "🔀 Merge master into develop (sync hotfixes)" \
             --body "This PR synchronizes the hotfixes from master back into develop."
-      - name: Create image
+
+      - name: Check if master→develop PR is mergeable in appcat repo
+        id: check_mergeable_appcat
         run: |
-          echo "image"
+          PR_JSON=$(gh pr list --repo "$APPCAT_REPO" --head master --base develop --state open --json number,mergeable)
+          PR_NUMBER=$(echo "$PR_JSON" | jq -r '.[0].number')
+          MERGEABLE=$(echo "$PR_JSON" | jq -r '.[0].mergeable')
+
+          if [ "$MERGEABLE" != "MERGEABLE" ]; then
+            echo "❌ PR #$PR_NUMBER is not mergeable (conflicts or unknown)."
+            exit 1
+          fi
+
+          echo "✅ PR #$PR_NUMBER is mergeable."
+          echo "pr-number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Create PR to merge master into develop in component repo
+        run: |
+          gh pr create \
+            --repo "$COMPONENT_REPO" \
+            --base develop \
+            --head master \
+            --reviewer ${{ needs.check-conditions.outputs.author }} \
+            --title "🔀 Merge master into develop (sync hotfixes)" \
+            --body "This PR synchronizes the hotfixes from master back into develop."
+
+      - name: Check if master→develop PR is mergeable in component repo
+        id: check_mergeable_component
+        run: |
+          PR_JSON=$(gh pr list --repo "$COMPONENT_REPO" --head master --base develop --state open --json number,mergeable)
+          PR_NUMBER=$(echo "$PR_JSON" | jq -r '.[0].number')
+          MERGEABLE=$(echo "$PR_JSON" | jq -r '.[0].mergeable')
+
+          if [ "$MERGEABLE" != "MERGEABLE" ]; then
+            echo "❌ PR #$PR_NUMBER is not mergeable (conflicts or unknown)."
+            exit 1
+          fi
+
+          echo "✅ PR #$PR_NUMBER is mergeable."
+          echo "pr-number=$PR_NUMBER" >> $GITHUB_OUTPUT
+
+      - name: Merge PR in appcat repo
+        run: |
+          echo "✅ Merging appcat PR: https://github.com/$APPCAT_REPO/pull/${{ steps.check_mergeable_appcat.outputs.pr-number }}"
+          gh pr merge -R "$APPCAT_REPO" ${{ needs.check-conditions.outputs.pr-number }} --merge
+
+      - name: Merge PR in component repo
+        run: |
+          echo "✅ Merging component PR: https://github.com/$COMPONENT_REPO/pull/${{ steps.check_mergeable_component.outputs.pr-number }}"
+          gh pr merge -R "$COMPONENT_REPO" ${{ steps.check_mergeable_component.outputs.pr-number }} --merge
