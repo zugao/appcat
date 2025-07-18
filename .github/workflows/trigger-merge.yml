@@ -288,6 +288,18 @@ jobs:
             git push origin "$COMPONENT_BRANCH"
           fi
 
+      - name: Retry mergeable check (GitHub race fix)
+        run: |
+          for i in {1..5}; do
+            MERGEABLE=$(gh pr view ${{ needs.check-conditions.outputs.comp-pr-number }} --repo "$COMPONENT_REPO" --json mergeable -q .mergeable)
+            echo "Mergeable state: $MERGEABLE"
+            if [ "$MERGEABLE" == "MERGEABLE" ]; then
+              break
+            fi
+            echo "🔁 Waiting for GitHub to refresh mergeability..."
+            sleep 3
+          done
+
       - name: Merge PR in component repo
         env:
           GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
@@ -358,7 +370,6 @@ jobs:
         run: |
           echo "✅ Merging appcat PR: https://github.com/$APPCAT_REPO/pull/${{ steps.check_mergeable_appcat.outputs.pr-number }}"
           gh pr merge -R "$APPCAT_REPO" ${{ needs.check-conditions.outputs.pr-number }} --merge
-
 
       - name: Merge PR in component repo
         env:
