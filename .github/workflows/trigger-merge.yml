@@ -222,6 +222,8 @@ jobs:
       COMPONENT_GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
     steps:
       - name: Merge PR in appcat repo
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "✅ Merging appcat PR: https://github.com/$APPCAT_REPO/pull/${{ needs.check-conditions.outputs.pr-number }}"
           gh pr merge -R "$APPCAT_REPO" ${{ needs.check-conditions.outputs.pr-number }} --merge --delete-branch
@@ -287,6 +289,8 @@ jobs:
           fi
 
       - name: Merge PR in component repo
+        env:
+          GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
         run: |
           echo "✅ Merging component PR: ${{ needs.check-conditions.outputs.comp-url }}"
           gh pr merge -R "$COMPONENT_REPO" ${{ needs.check-conditions.outputs.comp-pr-number }} --merge --delete-branch
@@ -349,11 +353,16 @@ jobs:
           echo "pr-number=$PR_NUMBER" >> $GITHUB_OUTPUT
 
       - name: Merge PR in appcat repo
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "✅ Merging appcat PR: https://github.com/$APPCAT_REPO/pull/${{ steps.check_mergeable_appcat.outputs.pr-number }}"
           gh pr merge -R "$APPCAT_REPO" ${{ needs.check-conditions.outputs.pr-number }} --merge
 
+
       - name: Merge PR in component repo
+        env:
+          GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
         run: |
           echo "✅ Merging component PR: https://github.com/$COMPONENT_REPO/pull/${{ steps.check_mergeable_component.outputs.pr-number }}"
           gh pr merge -R "$COMPONENT_REPO" ${{ steps.check_mergeable_component.outputs.pr-number }} --merge
