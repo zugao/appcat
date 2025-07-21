@@ -126,7 +126,7 @@ jobs:
       - name: Create PR in component repo
         run: |
           gh pr create \
-            --repo $COMPONENT_REPO \
+            --repo "$COMPONENT_REPO" \
             --base master \ 
             --head bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }} \
             --title "⬆️ Update appcat version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}" \
