@@ -1,4 +1,4 @@
-name: AppCat Release Pipeline
+name: Pre Release
 
 on:
   schedule:
