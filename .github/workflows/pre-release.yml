@@ -1,4 +1,4 @@
-name: 🔁 AppCat Release Pipeline
+name: AppCat Release Pipeline
 
 on:
   schedule:
@@ -45,6 +45,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Retry mergeable check
+        id: pr_mergeable
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -60,7 +61,7 @@ jobs:
           echo "mergeable=$MERGEABLE" >> "$GITHUB_OUTPUT"
 
       - name: Fail if not mergeable
-        if: steps.pr_info.outputs.mergeable != 'MERGEABLE'
+        if: steps.pr_mergeable.outputs.mergeable != 'MERGEABLE'
         run: |
           echo "PR #${{ steps.pr_info.outputs.pr_number }} is not mergeable!"
           exit 1
