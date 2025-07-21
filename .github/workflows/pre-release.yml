@@ -105,7 +105,7 @@ jobs:
         run: |
           echo "🔧 Patching class/defaults.yml..."
 
-          yq e ".parameters.appcat.images.appcat.tag = v4.164.0" class/defaults.yml \
+          yq e ".parameters.appcat.images.appcat.tag = "v4.164.0"" class/defaults.yml \
           | diff -B class/defaults.yml - \
           | patch class/defaults.yml - || echo "✅ No patch needed"
 
