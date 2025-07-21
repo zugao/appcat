@@ -120,11 +120,11 @@ jobs:
           git push origin HEAD
 
       - name: Create PR in component repo
+        #--head bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }} \
         run: |
           gh pr create \
             --repo $COMPONENT_REPO \
-            --base master \
-#            --head bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }} \
+            --base master \ 
             --head bump-version-v4.164.0 \
             --title "⬆️ Update appcat version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}" \
             --body "This PR updates the version in defaults.yaml and regenerates golden files."
