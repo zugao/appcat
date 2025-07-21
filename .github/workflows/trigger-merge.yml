@@ -191,7 +191,7 @@ jobs:
             git push origin "$COMPONENT_BRANCH"
           fi
 
-      - name: Retry mergeable check (GitHub race fix)
+      - name: Retry mergeable check
         run: |
           for i in {1..5}; do
             MERGEABLE=$(gh pr view ${{ needs.check-conditions.outputs.comp-pr-number }} --repo "$COMPONENT_REPO" --json mergeable -q .mergeable)
@@ -288,7 +288,9 @@ jobs:
             git push origin "$COMPONENT_BRANCH"
           fi
 
-      - name: Retry mergeable check (GitHub race fix)
+      - name: Retry mergeable check
+        env:
+          GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
         run: |
           for i in {1..5}; do
             MERGEABLE=$(gh pr view ${{ needs.check-conditions.outputs.comp-pr-number }} --repo "$COMPONENT_REPO" --json mergeable -q .mergeable)
@@ -308,7 +310,7 @@ jobs:
           gh pr merge -R "$COMPONENT_REPO" ${{ needs.check-conditions.outputs.comp-pr-number }} --merge --delete-branch
 
   merge-hotfix-update-develop:
-    needs: merge-hotfix
+    #needs: merge-hotfix
     runs-on: ubuntu-latest
     env:
       APPCAT_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -351,6 +353,8 @@ jobs:
 
       - name: Check if master→develop PR is mergeable in component repo
         id: check_mergeable_component
+        env:
+          GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
         run: |
           PR_JSON=$(gh pr list --repo "$COMPONENT_REPO" --head master --base develop --state open --json number,mergeable)
           PR_NUMBER=$(echo "$PR_JSON" | jq -r '.[0].number')
