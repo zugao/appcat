@@ -98,6 +98,7 @@ jobs:
           repository: ${{ env.COMPONENT_REPO }}
           token: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
           ref: develop
+          fetch-depth: 0
 
       - name: Configure Git
         run: |
