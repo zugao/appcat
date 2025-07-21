@@ -121,7 +121,7 @@ jobs:
           git checkout -b bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}
           git add .
           git commit -m "Update version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"
-          git push origin HEAD
+          git push origin HEAD -f
 
       - name: Create PR in component repo
         run: |
