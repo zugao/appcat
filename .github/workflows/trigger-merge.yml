@@ -323,7 +323,20 @@ jobs:
             --head master \
             --reviewer zugao \
             --title "🔀 Merge master into develop (sync hotfixes)" \
-            --body "This PR synchronizes the hotfixes from master back into develop."
+            --body "This PR synchronizes the hotfixes from master back into develop." || true
+
+      - name: Create PR to merge master into develop in component repo
+        env:
+          GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
+          # ${{ needs.check-conditions.outputs.author }} \
+        run: |
+          gh pr create \
+            --repo "$COMPONENT_REPO" \
+            --base develop \
+            --head master \
+            --reviewer zugao \
+            --title "🔀 Merge master into develop (sync hotfixes)" \
+            --body "This PR synchronizes the hotfixes from master back into develop." || true
 
       - name: Check if master→develop PR is mergeable in appcat repo
         id: check_mergeable_appcat
@@ -341,19 +354,6 @@ jobs:
 
           echo "✅ PR #$PR_NUMBER is mergeable."
           echo "pr-number=$PR_NUMBER" >> $GITHUB_OUTPUT
-
-      - name: Create PR to merge master into develop in component repo
-        env:
-          GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
-          # ${{ needs.check-conditions.outputs.author }} \
-        run: |
-          gh pr create \
-            --repo "$COMPONENT_REPO" \
-            --base develop \
-            --head master \
-            --reviewer zugao \
-            --title "🔀 Merge master into develop (sync hotfixes)" \
-            --body "This PR synchronizes the hotfixes from master back into develop."
 
       - name: Check if master→develop PR is mergeable in component repo
         id: check_mergeable_component
