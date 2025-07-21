@@ -105,10 +105,9 @@ jobs:
           git config --global user.email "actions@github.com"
 
       - name: Update version in class/defaults.yaml
-        #
         run: |
           echo "🔧 Patching class/defaults.yml..."
-          yq e ".parameters.appcat.images.appcat.tag = "${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"" class/defaults.yml \
+          yq e ".parameters.appcat.images.appcat.tag = ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}" class/defaults.yml \
           | diff -B class/defaults.yml - \
           | patch class/defaults.yml - || echo "✅ No patch needed"
 
