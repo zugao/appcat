@@ -312,13 +312,10 @@ jobs:
   merge-hotfix-update-develop:
     #needs: merge-hotfix
     runs-on: ubuntu-latest
-    env:
-      APPCAT_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      COMPONENT_GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
     steps:
       - name: Create PR to merge master into develop in appcat repo
         env:
-          GH_TOKEN: ${{ secrets.APPCAT_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh pr create \
             --repo "$APPCAT_REPO" \
@@ -331,7 +328,7 @@ jobs:
       - name: Check if master→develop PR is mergeable in appcat repo
         id: check_mergeable_appcat
         env:
-          GH_TOKEN: ${{ secrets.APPCAT_GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           PR_JSON=$(gh pr list --repo "$APPCAT_REPO" --head master --base develop --state open --json number,mergeable)
           PR_NUMBER=$(echo "$PR_JSON" | jq -r '.[0].number')
