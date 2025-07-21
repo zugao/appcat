@@ -100,9 +100,10 @@ jobs:
           git config --global user.email "actions@github.com"
 
       - name: Update version in class/defaults.yaml
+        #          yq e ".parameters.appcat.images.appcat.tag = "${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"" class/defaults.yml \
         run: |
           echo "🔧 Patching class/defaults.yml..."
-#          yq e ".parameters.appcat.images.appcat.tag = "{{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"" class/defaults.yml \
+
           yq e ".parameters.appcat.images.appcat.tag = v4.164.0" class/defaults.yml \
           | diff -B class/defaults.yml - \
           | patch class/defaults.yml - || echo "✅ No patch needed"
@@ -111,11 +112,13 @@ jobs:
         run: make gen-golden-all
 
       - name: Commit and push changes
+        #          git checkout -b bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}
+        #          git commit -m "Update version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"
         run: |
-#          git checkout -b bump-version-{{ needs.create-and-merge-appcat-pr.outputs.new_tag }}
+
           git checkout -b bump-version-v4.164.0
           git add .
-#          git commit -m "Update version to {{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"
+
           git commit -m "Update version to v4.164.0"
           git push origin HEAD
 
