@@ -118,17 +118,15 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git checkout -b bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}
-          git add .
           git commit -m "Update version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"
-          git push origin HEAD -f
+          git push origin develop
 
       - name: Create PR in component repo
         run: |
           gh pr create \
             --repo "$COMPONENT_REPO" \
-            --base master \ 
-            --head bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }} \
+            --base master \
+            --head develop \
             --title "⬆️ Update appcat version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}" \
             --body "This PR updates the version in defaults.yaml and regenerates golden files."
         env:
