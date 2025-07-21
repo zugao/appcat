@@ -317,17 +317,21 @@ jobs:
       COMPONENT_GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
     steps:
       - name: Create PR to merge master into develop in appcat repo
+        env:
+          GH_TOKEN: ${{ secrets.APPCAT_GH_TOKEN }}
         run: |
           gh pr create \
             --repo "$APPCAT_REPO" \
             --base develop \
             --head master \
-            --reviewer ${{ needs.check-conditions.outputs.author }} \
+            --reviewer zugao \
             --title "🔀 Merge master into develop (sync hotfixes)" \
             --body "This PR synchronizes the hotfixes from master back into develop."
 
       - name: Check if master→develop PR is mergeable in appcat repo
         id: check_mergeable_appcat
+        env:
+          GH_TOKEN: ${{ secrets.APPCAT_GH_TOKEN }}
         run: |
           PR_JSON=$(gh pr list --repo "$APPCAT_REPO" --head master --base develop --state open --json number,mergeable)
           PR_NUMBER=$(echo "$PR_JSON" | jq -r '.[0].number')
@@ -342,12 +346,15 @@ jobs:
           echo "pr-number=$PR_NUMBER" >> $GITHUB_OUTPUT
 
       - name: Create PR to merge master into develop in component repo
+        env:
+          GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
+          # ${{ needs.check-conditions.outputs.author }} \
         run: |
           gh pr create \
             --repo "$COMPONENT_REPO" \
             --base develop \
             --head master \
-            --reviewer ${{ needs.check-conditions.outputs.author }} \
+            --reviewer zugao \
             --title "🔀 Merge master into develop (sync hotfixes)" \
             --body "This PR synchronizes the hotfixes from master back into develop."
 
