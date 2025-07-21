@@ -73,16 +73,16 @@ jobs:
 #        env:
 #          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Bump minor version and tag
-        id: bump
-        run: |
-          LATEST_TAG=$(git describe --tags --abbrev=0)
-          MAJOR=$(echo "$LATEST_TAG" | cut -d. -f1)
-          MINOR=$(echo "$LATEST_TAG" | cut -d. -f2)
-          NEW_TAG="$MAJOR.$((MINOR + 1)).0"
-          git tag $NEW_TAG
-          git push origin $NEW_TAG
-          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
+#      - name: Bump minor version and tag
+#        id: bump
+#        run: |
+#          LATEST_TAG=$(git describe --tags --abbrev=0)
+#          MAJOR=$(echo "$LATEST_TAG" | cut -d. -f1)
+#          MINOR=$(echo "$LATEST_TAG" | cut -d. -f2)
+#          NEW_TAG="$MAJOR.$((MINOR + 1)).0"
+#          git tag $NEW_TAG
+#          git push origin $NEW_TAG
+#          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
 
   update-component:
     needs: create-and-merge-appcat-pr
@@ -121,12 +121,13 @@ jobs:
 
       - name: Create PR in component repo
         #--head bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }} \
+        # --title "⬆️ Update appcat version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}" \
         run: |
           gh pr create \
             --repo $COMPONENT_REPO \
             --base master \ 
             --head bump-version-v4.164.0 \
-            --title "⬆️ Update appcat version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}" \
+            --title "⬆️ Update appcat version to test" \
             --body "This PR updates the version in defaults.yaml and regenerates golden files."
         env:
           GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
