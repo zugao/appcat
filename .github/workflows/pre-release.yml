@@ -91,7 +91,7 @@ jobs:
       - name: Clone component repo
         uses: actions/checkout@v4
         with:
-          repository: $APPCAT_REPO
+          repository: $COMPONENT_APPCAT
           token: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
 
       - name: Configure Git
@@ -102,7 +102,8 @@ jobs:
       - name: Update version in class/defaults.yaml
         run: |
           echo "🔧 Patching class/defaults.yml..."
-          yq e ".parameters.appcat.images.appcat.tag = "${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"" class/defaults.yml \
+#          yq e ".parameters.appcat.images.appcat.tag = "${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"" class/defaults.yml \
+          yq e ".parameters.appcat.images.appcat.tag = v4.164.0" class/defaults.yml \
           | diff -B class/defaults.yml - \
           | patch class/defaults.yml - || echo "✅ No patch needed"
 
@@ -111,9 +112,11 @@ jobs:
 
       - name: Commit and push changes
         run: |
-          git checkout -b bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}
+#          git checkout -b bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}
+          git checkout -b bump-version-v4.164.0
           git add .
-          git commit -m "Update version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"
+#          git commit -m "Update version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"
+          git commit -m "Update version to v4.164.0"
           git push origin HEAD
 
       - name: Create PR in component repo
@@ -121,7 +124,8 @@ jobs:
           gh pr create \
             --repo $COMPONENT_REPO \
             --base master \
-            --head bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }} \
+#            --head bump-version-${{ needs.create-and-merge-appcat-pr.outputs.new_tag }} \
+            --head bump-version-v4.164.0 \
             --title "⬆️ Update appcat version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}" \
             --body "This PR updates the version in defaults.yaml and regenerates golden files."
         env:
