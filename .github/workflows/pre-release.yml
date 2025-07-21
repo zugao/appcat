@@ -118,6 +118,7 @@ jobs:
 
       - name: Commit and push changes
         run: |
+          git add .
           git commit -m "Update version to ${{ needs.create-and-merge-appcat-pr.outputs.new_tag }}"
           git push origin develop
 
