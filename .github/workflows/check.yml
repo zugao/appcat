@@ -1,4 +1,4 @@
-name: Check if develop is up to date with master
+name: Check
 
 on:
   schedule:
