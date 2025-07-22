@@ -14,12 +14,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch and create tracking branches
-        run: |
-          git fetch origin
-          git checkout -b master origin/master
-          git checkout -b develop origin/develop
-
       - name: Check if develop contains all commits from master
         run: |
           if [ -n "$(git rev-list master ^develop)" ]; then
