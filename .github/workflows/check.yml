@@ -1,0 +1,29 @@
+name: Check if develop is up to date with master
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Every day at 04:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch all remote branches
+        run: git fetch origin
+
+      - name: Check if develop contains all commits from master
+        run: |
+          git checkout origin/develop
+          if git merge-base --is-ancestor origin/master origin/develop; then
+            echo "✅ develop contains all commits from master"
+          else
+            echo "❌ develop is missing commits from master"
+            git log origin/develop..origin/master --oneline
+            exit 1
+          fi

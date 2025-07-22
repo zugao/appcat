@@ -6,8 +6,8 @@ on:
   workflow_dispatch: # Allow manual trigger
 
 env:
-  COMPONENT_REPO: zugao/component-appcat
-  APPCAT_REPO: zugao/appcat
+  COMPONENT_REPO: vshn/component-appcat
+  APPCAT_REPO: vshn/appcat
 
 jobs:
   create-and-merge-appcat-pr:

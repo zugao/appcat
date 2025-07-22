@@ -6,8 +6,8 @@ on:
 
 
 env:
-  COMPONENT_REPO: zugao/component-appcat
-  APPCAT_REPO: zugao/appcat
+  COMPONENT_REPO: vshn/component-appcat
+  APPCAT_REPO: vshn/appcat
 
 jobs:
   check-conditions:
@@ -310,7 +310,7 @@ jobs:
           gh pr merge -R "$COMPONENT_REPO" ${{ needs.check-conditions.outputs.comp-pr-number }} --merge --delete-branch
 
   merge-hotfix-update-develop:
-    #needs: merge-hotfix
+    needs: merge-hotfix
     runs-on: ubuntu-latest
     steps:
       - name: Create PR to merge master into develop in appcat repo
@@ -321,20 +321,19 @@ jobs:
             --repo "$APPCAT_REPO" \
             --base develop \
             --head master \
-            --reviewer zugao \
+            --reviewer ${{ needs.check-conditions.outputs.author }} \ \
             --title "🔀 Merge master into develop (sync hotfixes)" \
             --body "This PR synchronizes the hotfixes from master back into develop." || true
 
       - name: Create PR to merge master into develop in component repo
         env:
           GH_TOKEN: ${{ secrets.COMPONENT_ACCESS_TOKEN }}
-          # ${{ needs.check-conditions.outputs.author }} \
         run: |
           gh pr create \
             --repo "$COMPONENT_REPO" \
             --base develop \
             --head master \
-            --reviewer zugao \
+            --reviewer ${{ needs.check-conditions.outputs.author }} \ \
             --title "🔀 Merge master into develop (sync hotfixes)" \
             --body "This PR synchronizes the hotfixes from master back into develop." || true
 
