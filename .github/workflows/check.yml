@@ -16,9 +16,9 @@ jobs:
 
       - name: Check if develop contains all commits from master
         run: |
-          if [ -n "$(git rev-list master ^develop)" ]; then
+          if [ -n "$(git rev-list origin/master ^origin/develop)" ]; then
             echo "❌ develop is missing commits from master:"
-            git log develop..master --oneline | tee log.txt
+            git log origin/develop..origin/master --oneline | tee log.txt
             exit 1
           else
             echo "✅ develop includes all commits from master"
